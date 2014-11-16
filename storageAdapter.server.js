@@ -233,7 +233,11 @@ FS.StorageAdapter = function(storeName, options, api) {
     if (callback) {
       return self._removeAsync(fileKey, FS.Utility.safeCallback(callback));
     } else {
-      return Meteor._wrapAsync(self._removeAsync)(fileKey);
+      if (Meteor.wrapAsync) {
+        return Meteor.wrapAsync(self._removeAsync)(fileKey);
+      } else {
+        return Meteor._wrapAsync(self._removeAsync)(fileKey);
+      }
     }
   };
 
@@ -244,7 +248,11 @@ FS.StorageAdapter = function(storeName, options, api) {
   };
 
   if (typeof api.init === 'function') {
-    Meteor._wrapAsync(api.init.bind(self))();
+    if (Meteor.wrapAsync) {
+      Meteor.wrapAsync(api.init.bind(self))();
+    } else {
+      Meteor._wrapAsync(api.init.bind(self))();
+    }
   }
 
   // This supports optional transformWrite and transformRead
